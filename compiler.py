@@ -16,7 +16,29 @@ class LanguageDefinition:
         with open(input_file_name) as fh:
             lines = fh.read().splitlines()
 
-        #for line in lines:
+        for line in lines:
+            if line.startswith("variables: "):
+                line = line.replace("variables: ", "")
+                line = line.split()
+                for variable in line:
+                    self.variables.append(variable)
+
+            if line.startswith("constants: "):
+                line = line.replace("constants: ", "")
+                line = line.split()
+                for constant in line:
+                    self.constants.append(constant)
+
+            if line.startswith("predicates: "):
+                line = line.replace("predicates: ", "")
+                line = line.split()
+                for predicate in line:
+                    new_predicate = []
+                    new_predicate.append(predicate[0])
+                    new_predicate.append(predicate[2:-1])
+                    self.predicates.append(new_predicate)
+
+
 
 
 
