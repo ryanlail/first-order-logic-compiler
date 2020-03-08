@@ -8,8 +8,13 @@ class LanguageDefinition:
         self.constants = []
         self.predicates = {} # hash table (predicate -> arity)
         self.equality = ""
-        self.connectives = []
-        self.quantifiers = []
+        self.and = ""
+        self.or = ""
+        self.implies = ""
+        self.iff = ""
+        self.neg = ""
+        self.exists = ""
+        self.forall = ""
         self.formula = ""
 
     def read_input(self, input_file_name):
@@ -47,19 +52,29 @@ class LanguageDefinition:
 
             elif line.startswith("equality"):
                 line = line.replace("equality: ", "")
+                if len(line) == 0:
+                    # error
+                    pass
                 self.equality = line
 
             elif line.startswith("connectives"):
                 line = line.replace("connectives: ", "")
                 line = line.split()
-                for connective in line:
-                    self.connectives.append(connective)
+                try:
+                    self.and = line[0]
+                    self.or = line[1]
+                    self.implies = line[2]
+                    self.iff = line[3]
+                    self.neg = line[4]
+                except:
+                    #error
+                    pass
 
             elif line.startswith("quantifiers"):
                 line = line.replace("quantifiers: ", "")
                 line = line.split()
-                for quantifer in line:
-                    self.quantifiers.append(quantifer)
+                try:
+                    self.
 
             elif line.startswith("formula"):
                 line = line.replace("formula: ", "")
