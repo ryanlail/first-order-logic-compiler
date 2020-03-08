@@ -6,7 +6,7 @@ class LanguageDefinition:
     def __init__(self):
         self.variables = []
         self.constants = []
-        self.predicates = [] #  2d array e.g. [[p,2],[q,1]]
+        self.predicates = {} # hash table (predicate -> arity)
         self.equality = ""
         self.connectives = []
         self.quantifiers = []
@@ -17,32 +17,53 @@ class LanguageDefinition:
             lines = fh.read().splitlines()
 
         for line in lines:
-            if line.startswith("variables: "):
+            if line.startswith("variables"):
                 line = line.replace("variables: ", "")
                 line = line.split()
                 for variable in line:
                     self.variables.append(variable)
 
-            if line.startswith("constants: "):
+            elif line.startswith("constants"):
                 line = line.replace("constants: ", "")
                 line = line.split()
                 for constant in line:
                     self.constants.append(constant)
 
-            if line.startswith("predicates: "):
+            elif line.startswith("predicates"):
                 line = line.replace("predicates: ", "")
                 line = line.split()
                 for predicate in line:
-                    new_predicate = []
-                    new_predicate.append(predicate[0])
-                    new_predicate.append(predicate[2:-1])
-                    self.predicates.append(new_predicate)
+                    predicate_name = ""
+                    predicate_arity = ""
+                    count = 0
+                    while predicate[count] != '[':
+                        predicate_name += predicate[count]
+                        count += 1
+                    count += 1
+                    while predicate[count] != ']':
+                        predicate_arity += predicate[count]
+                        count += 1
+                    self.predicates[predicate_name] = int(predicate_arity)
 
+            elif line.startswith("equality"):
+                line = line.replace("equality: ", "")
+                self.equality = line
 
+            elif line.startswith("connectives"):
+                line = line.replace("connectives: ", "")
+                line = line.split()
+                for connective in line:
+                    self.connectives.append(connective)
 
+            elif line.startswith("quantifiers"):
+                line = line.replace("quantifiers: ", "")
+                line = line.split()
+                for quantifer in line:
+                    self.quantifiers.append(quantifer)
 
-
-
+            elif line.startswith("formula"):
+                line = line.replace("formula: ", "")
+                self.formula = line
 
 
 def arg_parser():
