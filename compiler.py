@@ -15,9 +15,9 @@ class LanguageDefinition:
         self.neg = ""
         self.exists = ""
         self.forall = ""
-        self.formula = ""
         self.whitespace = [" ", "\n", "\t"]
         self.neccesary_chars = ["(", ")", ","]
+        self.formula = ""
 
     def read_input(self, input_file_name):
         with open(input_file_name) as fh:
@@ -91,9 +91,71 @@ class Grammar:
         self.productions = set()
         self.start_symbol = ""
 
-        self.populate_non_terminals(LanguageDefiniton)
+        self.populate_terminals(LanguageDefiniton)
 
-    def populate_non_terminals(self, ):
+    def populate_terminals(self, LanguageDefinition):
+        for variable in LanguageDefinition.variables:
+            if variable in self.terminals():
+                # error
+                pass
+            self.terminals.add(variable)
+        for constant in LanguageDefinition.constants:
+            if constant in self.terminals():
+                # error
+                pass
+            self.termainals.add(constant)
+        for predicate in LanguageDefinition.predicates.keys():
+            if predicate in self.terminals():
+                # error
+                pass
+            self.terminals.add(predicate)
+        if LanguageDefinition.equality in self.terminals():
+            # error
+            pass
+        else:
+            self.terminals.add(LanguageDefinition.equality)
+        if LanguageDefinition.and in self.terminals():
+            # error
+            pass
+        else:
+            self.termianls.add(LanguageDefinition.and)
+        if LanguageDefinition.or in self.terminals():
+            # error
+            pass
+        else:
+            self.terminals.add(LanguageDefinition.or)
+        if LanguageDefinition.implies in self.terminals():
+            # error
+            pass
+        else:
+            self.terminals.add(LanguageDefinition.implies)
+        if LanguageDefinition.iff in self.terminals():
+            # error
+            pass
+        else:
+            self.terminals.add(LanguageDefinition.iff)
+        if LanguageDefinition.neg in self.terminals():
+            # error
+            pass
+        else:
+            self.terminals.add(LanguageDefinition.neg)
+        if LanguageDefinition.exists in self.terminals():
+            # error
+            pass
+        else:
+            self.terminals.add(LanguageDefinition.exists)
+        if LanguageDefinition.forall in self.terminals():
+            #error
+            pass
+        else:
+            self.terminals.add(LanguageDefinition.forall)
+        for neccesary_char in LanguageDefinition.neccesary_chars():
+            if neccesary_char in self.terminals():
+                # error
+                pass
+            else:
+                self.termainals.add(LanguageDefinition.neccesary_chars)
+
 
 
 
