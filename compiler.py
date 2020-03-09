@@ -16,6 +16,8 @@ class LanguageDefinition:
         self.exists = ""
         self.forall = ""
         self.formula = ""
+        self.whitespace = [" ", "\n", "\t"]
+        self.neccesary_chars = ["(", ")", ","]
 
     def read_input(self, input_file_name):
         with open(input_file_name) as fh:
@@ -74,11 +76,25 @@ class LanguageDefinition:
                 line = line.replace("quantifiers: ", "")
                 line = line.split()
                 try:
-                    self.
+                    self.exists = line[0]
+                    self.forall = line[1]
 
             elif line.startswith("formula"):
                 line = line.replace("formula: ", "")
                 self.formula = line
+
+class Grammar:
+
+    def __init__(self, LanguageDefinition):
+        self.terminals = set()
+        self.non_terminals = set()
+        self.productions = set()
+        self.start_symbol = ""
+
+        self.populate_non_terminals(LanguageDefiniton)
+
+    def populate_non_terminals(self, ):
+
 
 
 def arg_parser():
@@ -94,6 +110,7 @@ def main():
     arguments = arg_parser()
     input_from_file = LanguageDefinition()
     input_from_file.read_input(arguments.input_file_name)
+
 
 if __name__ == "__main__":
     main()
