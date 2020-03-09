@@ -87,9 +87,9 @@ class Grammar:
 
     def __init__(self, LanguageDefinition):
         self.terminals = set()
-        self.non_terminals = set()
-        self.productions = set()
-        self.start_symbol = ""
+        self.non_terminals = {"<VARIABLES>", "<CONSTANTS>", "<PREDICATE_NAMES>", "<CONNECTIVES>", "<QUANTIFIERS>", "<PREDICATE>", "<PREDICADE_PARAM>", "<ASSIGNMENT>", "<VAR_CON>>", "<LOGIC>", "<FORMULA>", "<QUANTIFICATION>", "<STATEMENT>"}
+        self.productions = []
+        self.start_symbol = "<STATEMENT>"
 
         self.populate_terminals(LanguageDefiniton)
 
