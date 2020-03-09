@@ -87,11 +87,14 @@ class Grammar:
 
     def __init__(self, LanguageDefinition):
         self.terminals = set()
-        self.non_terminals = {"<VARIABLES>", "<CONSTANTS>", "<PREDICATE_NAMES>", "<CONNECTIVES>", "<QUANTIFIERS>", "<PREDICATE>", "<PREDICADE_PARAM>", "<ASSIGNMENT>", "<VAR_CON>>", "<LOGIC>", "<FORMULA>", "<QUANTIFICATION>", "<STATEMENT>"}
+        self.non_terminals = {"<VARIABLES>", "<CONSTANTS>", "<PREDICATE_NAMES>", "<CONNECTIVES>",
+                "<QUANTIFIERS>", "<PREDICATE>", "<PREDICADE_PARAM>", "<ASSIGNMENT>", "<VAR_CON>>",
+                "<LOGIC>", "<FORMULA>", "<QUANTIFICATION>", "<STATEMENT>"}
         self.productions = []
         self.start_symbol = "<STATEMENT>"
 
         self.populate_terminals(LanguageDefiniton)
+        self.populate_productions()
 
     def populate_terminals(self, LanguageDefinition):
         for variable in LanguageDefinition.variables:
@@ -155,6 +158,8 @@ class Grammar:
                 pass
             else:
                 self.termainals.add(LanguageDefinition.neccesary_chars)
+
+    def populate_productions(self)
 
 
 
