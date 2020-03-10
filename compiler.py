@@ -217,7 +217,11 @@ class LexicalAnalyser():
 
     def __init__(self, LanguageDefinition):
         self.lexeme_stream = LanguageDefinition.formula
+        self.symbol_table = []
+        self.tokens = [] # 2d array, token and id
         self.sanatized_stream = self.sanatize_stream(LanguageDefinition)
+        #print(self.sanatized_stream)
+        self.tokenize(LanguageDefinition)
 
     def sanatize_stream(self, LanguageDefinition):
         for whitespace in LanguageDefinition.whitespace:
@@ -226,6 +230,35 @@ class LexicalAnalyser():
         self.lexeme_stream = self.lexeme_stream.replace(")", " ) ")
         self.lexeme_stream = self.lexeme_stream.replace(",", " , ")
         return self.lexeme_stream.split()
+
+    def tokenize(self, LanguageDefinition):
+        for lexeme in self.sanatized_stream:
+            if lexeme in LanguageDefinition.variables:
+                self.tokens.append(["VARIABLE", len(self.symbol_table)])
+                self.symbol_table.append(lexeme)
+            elif lexeme in LanguageDefinition.constants:
+                self.tokens.append(["CONSTANT", len(self.symbol_table)])
+                self.symbol_table.append(lexeme)
+            elif lexeme == LanguageDefinition.equality:
+                self.tokens.append(["EQUALITY"])
+            elif lexeme == LanguageDefinition.and_:
+                self.tokens.append(["AND"])
+            elif lexeme == LanguageDefinition.or_:
+                self.tokens.append(["OR"])
+            elif lexeme == LanguageDefinition.implies:
+                self.tokens.append(["IMPLIES"])
+            elif lexeme == LanguageDefinition.iff:
+                self.tokens.append(["IFF"])
+            elif lexeme == LanguageDefinition.neg:
+                self.tokens.append(["NEG"])
+            elif lexeme == LanguageDefinition.exists:
+                self.tokens.append(["EXISTS"])
+            elif lexeme == LanguageDefinition.forall:
+                self.tokens.append(["FORALL"])
+            else:
+                self.tokens.append([lexeme])
+        print(self.tokens)
+
 
 
 
