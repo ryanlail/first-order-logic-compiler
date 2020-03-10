@@ -88,7 +88,7 @@ class LanguageDefinition:
 
 class Grammar:
 
-    def __init__(self, LanguageDefiniton):
+    def __init__(self, LanguageDefinition):
         self.terminals = set()
         self.non_terminals = {"<VARIABLES>", "<CONSTANTS>", "<PREDICATE_NAMES>", "<CONNECTIVES>",
                 "<QUANTIFIERS>", "<PREDICATE>", "<PREDICADE_PARAM>", "<ASSIGNMENT>", "<VAR_CON>",
@@ -96,7 +96,7 @@ class Grammar:
         self.productions = []
         self.start_symbol = "<FORMULA>"
 
-        self.populate_terminals(LanguageDefiniton)
+        self.populate_terminals(LanguageDefinition)
         self.populate_productions(LanguageDefinition)
 
     def populate_terminals(self, LanguageDefinition):
@@ -160,7 +160,7 @@ class Grammar:
                 # error
                 pass
             else:
-                self.terminals.add(LanguageDefinition.neccesary_chars)
+                self.terminals.add(neccesary_char)
 
     def populate_productions(self, LanguageDefinition):
         self.productions.append("<FORMULA> -> <QUANTIFICATION>|<LOGIC>|<ASSIGNMENT>|<PREDICATE>")
@@ -178,18 +178,18 @@ class Grammar:
 
         predicate_names_rule = "<PREDICATE_NAMES> ->"
         for predicate in LanguageDefinition.predicates.keys():
-            predicate_names_rules += predicate + "|"
-        self.productions.append(predicate_names_rules[:-1])
+            predicate_names_rule += predicate + "|"
+        self.productions.append(predicate_names_rule[:-1])
 
         constants_rule = "<CONSTANTS> ->"
         for constant in LanguageDefinition.constants:
-            constants_rules += constant + "|"
+            constants_rule += constant + "|"
         self.productions.append(constants_rule[:-1])
 
         variables_rule = "<VARIABLES> ->"
         for variable in LanguageDefinition.variables:
-            variables_rules += variable + "|"
-        self.productions.append(variable_rule[:-1])
+            variables_rule += variable + "|"
+        self.productions.append(variables_rule[:-1])
 
 
 
