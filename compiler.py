@@ -91,7 +91,7 @@ class Grammar:
     def __init__(self, LanguageDefinition):
         self.terminals = set()
         self.non_terminals = {"<VARIABLES>", "<CONSTANTS>", "<PREDICATE_NAMES>", "<CONNECTIVES>",
-                "<QUANTIFIERS>", "<PREDICATE>", "<PREDICADE_PARAM>", "<ASSIGNMENT>", "<VAR_CON>",
+                "<QUANTIFIERS>", "<PREDICATE>", "<ASSIGNMENT>", "<VAR_CON>",
                 "<LOGIC>", "<FORMULA>", "<QUANTIFICATION>"}
         self.productions = []
         self.start_symbol = "<FORMULA>"
@@ -163,30 +163,33 @@ class Grammar:
                 self.terminals.add(neccesary_char)
 
     def populate_productions(self, LanguageDefinition):
-        self.productions.append("<FORMULA> -> <QUANTIFICATION>|<LOGIC>|<ASSIGNMENT>|<PREDICATE>")
-        self.productions.append("<QUANTIFICATION> -> <QUANTIFIERS><VARIABLES><FORMULA>")
-        self.productions.append("<LOGIC> -> (<FORMULA><CONNECTIVES><FORMULA>)|" + LanguageDefinition.neg +
+        self.productions.append("<FORMULA> -> <QUANTIFICATION> | <LOGIC> | <ASSIGNMENT> | <PREDICATE>")
+        self.productions.append("<QUANTIFICATION> -> <QUANTIFIERS> <VARIABLES> <FORMULA>")
+        self.productions.append("<LOGIC> -> (<FORMULA> <CONNECTIVES> <FORMULA>) | " + LanguageDefinition.neg +
                 "<FORMULA>")
-        self.productions.append("<ASSIGNMENT> -> (<VAR_CON>" + LanguageDefinition.equality + "<VAR_CON>)")
-        self.productions.append("<PREDICATE> -> <PREDICATE_NAMES>(<PREDICATE_PARAM><VARIABLES>)")
+        self.productions.append("<ASSIGNMENT> -> (<VAR_CON> " + LanguageDefinition.equality + "<VAR_CON>)")
+
+        predicate_rule = "<PREDICATE> -> "
+        for predicate in LanguageDefinition.predicates.keys():
+            predicate_rule += predicate + "("
+            for arity in range(LanguageDefinition.predicates[predicate]):
+                predicate_rule += "<VARIABLES>,"
+            predicate_rule = predicate_rule[:-1]
+            predicate_rule += ")|"
+        self.productions.append(predicate_rule[:-1])
+
         self.productions.append("<VAR_CON> -> <VARIABLES>|<CONSTANTS>")
-        self.productions.append("<PREDICATE_PARAM> -> <VARIABLES>,<PREDICATE_PARAM>|ϵ")
         self.productions.append("<QUANTIFIERS> -> " + LanguageDefinition.exists + "|" +
                 LanguageDefinition.forall)
         self.productions.append("<CONNECTIVES> -> " + LanguageDefinition.and_ + "|" + LanguageDefinition.or_ +
                 "|" + LanguageDefinition.implies + "|" + LanguageDefinition.iff)
 
-        predicate_names_rule = "<PREDICATE_NAMES> ->"
-        for predicate in LanguageDefinition.predicates.keys():
-            predicate_names_rule += predicate + "|"
-        self.productions.append(predicate_names_rule[:-1])
-
-        constants_rule = "<CONSTANTS> ->"
+        constants_rule = "<CONSTANTS> -> "
         for constant in LanguageDefinition.constants:
             constants_rule += constant + "|"
         self.productions.append(constants_rule[:-1])
 
-        variables_rule = "<VARIABLES> ->"
+        variables_rule = "<VARIABLES> -> "
         for variable in LanguageDefinition.variables:
             variables_rule += variable + "|"
         self.productions.append(variables_rule[:-1])
