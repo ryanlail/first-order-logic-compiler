@@ -90,7 +90,7 @@ class Grammar:
 
     def __init__(self, LanguageDefinition):
         self.terminals = set()
-        self.non_terminals = {"<VARIABLES>", "<CONSTANTS>", "<PREDICATE_NAMES>", "<CONNECTIVES>",
+        self.non_terminals = {"<VARIABLES>", "<CONSTANTS>", "<CONNECTIVES>",
                 "<QUANTIFIERS>", "<PREDICATE>", "<ASSIGNMENT>", "<VAR_CON>",
                 "<LOGIC>", "<FORMULA>", "<QUANTIFICATION>"}
         self.productions = []
@@ -166,33 +166,33 @@ class Grammar:
         self.productions.append("<FORMULA> -> <QUANTIFICATION> | <LOGIC> | <ASSIGNMENT> | <PREDICATE>")
         self.productions.append("<QUANTIFICATION> -> <QUANTIFIERS> <VARIABLES> <FORMULA>")
         self.productions.append("<LOGIC> -> (<FORMULA> <CONNECTIVES> <FORMULA>) | " + LanguageDefinition.neg +
-                "<FORMULA>")
-        self.productions.append("<ASSIGNMENT> -> (<VAR_CON> " + LanguageDefinition.equality + "<VAR_CON>)")
+                " <FORMULA>")
+        self.productions.append("<ASSIGNMENT> -> (<VAR_CON> " + LanguageDefinition.equality + " <VAR_CON>)")
 
         predicate_rule = "<PREDICATE> -> "
         for predicate in LanguageDefinition.predicates.keys():
             predicate_rule += predicate + "("
             for arity in range(LanguageDefinition.predicates[predicate]):
-                predicate_rule += "<VARIABLES>,"
-            predicate_rule = predicate_rule[:-1]
-            predicate_rule += ")|"
-        self.productions.append(predicate_rule[:-1])
+                predicate_rule += "<VARIABLES>, "
+            predicate_rule = predicate_rule[:-2]
+            predicate_rule += ") | "
+        self.productions.append(predicate_rule[:-2])
 
-        self.productions.append("<VAR_CON> -> <VARIABLES>|<CONSTANTS>")
-        self.productions.append("<QUANTIFIERS> -> " + LanguageDefinition.exists + "|" +
+        self.productions.append("<VAR_CON> -> <VARIABLES> | <CONSTANTS>")
+        self.productions.append("<QUANTIFIERS> -> " + LanguageDefinition.exists + " | " +
                 LanguageDefinition.forall)
-        self.productions.append("<CONNECTIVES> -> " + LanguageDefinition.and_ + "|" + LanguageDefinition.or_ +
-                "|" + LanguageDefinition.implies + "|" + LanguageDefinition.iff)
+        self.productions.append("<CONNECTIVES> -> " + LanguageDefinition.and_ + " | " + LanguageDefinition.or_ +
+                " | " + LanguageDefinition.implies + " | " + LanguageDefinition.iff)
 
         constants_rule = "<CONSTANTS> -> "
         for constant in LanguageDefinition.constants:
-            constants_rule += constant + "|"
-        self.productions.append(constants_rule[:-1])
+            constants_rule += constant + " | "
+        self.productions.append(constants_rule[:-2])
 
         variables_rule = "<VARIABLES> -> "
         for variable in LanguageDefinition.variables:
-            variables_rule += variable + "|"
-        self.productions.append(variables_rule[:-1])
+            variables_rule += variable + " | "
+        self.productions.append(variables_rule[:-2])
 
     def output(self, file_name):
         with open(file_name, "w") as fh:
