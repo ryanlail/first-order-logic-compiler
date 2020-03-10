@@ -8,8 +8,8 @@ class LanguageDefinition:
         self.constants = []
         self.predicates = {} # hash table (predicate -> arity)
         self.equality = ""
-        self.and = ""
-        self.or = ""
+        self.and_ = ""
+        self.or_ = ""
         self.implies = ""
         self.iff = ""
         self.neg = ""
@@ -63,8 +63,8 @@ class LanguageDefinition:
                 line = line.replace("connectives: ", "")
                 line = line.split()
                 try:
-                    self.and = line[0]
-                    self.or = line[1]
+                    self.and_ = line[0]
+                    self.or_ = line[1]
                     self.implies = line[2]
                     self.iff = line[3]
                     self.neg = line[4]
@@ -78,6 +78,9 @@ class LanguageDefinition:
                 try:
                     self.exists = line[0]
                     self.forall = line[1]
+                except:
+                    # error
+                    pass
 
             elif line.startswith("formula"):
                 line = line.replace("formula: ", "")
@@ -121,12 +124,12 @@ class Grammar:
             # error
             pass
         else:
-            self.termianls.add(LanguageDefinition.and)
+            self.termianls.add(LanguageDefinition.and_)
         if LanguageDefinition.or in self.terminals():
             # error
             pass
         else:
-            self.terminals.add(LanguageDefinition.or)
+            self.terminals.add(LanguageDefinition.or_)
         if LanguageDefinition.implies in self.terminals():
             # error
             pass
@@ -170,7 +173,7 @@ class Grammar:
         self.productions.append("<PREDICATE_PARAM> -> <VARIABLES>,<PREDICATE_PARAM>|ϵ")
         self.productions.append("<QUANTIFIERS> -> " + LanguageDefinition.exists + "|" +
                 LanguageDefinition.forall)
-        self.productions.append("<CONNECTIVES> -> " + LanguageDefinition.and + "|" + LanguageDefinition.or +
+        self.productions.append("<CONNECTIVES> -> " + LanguageDefinition.and_ + "|" + LanguageDefinition.or_ +
                 "|" + LanguageDefinition.implies + "|" + LanguageDefinition.iff)
 
         predicate_names_rule = "<PREDICATE_NAMES> ->"
@@ -205,6 +208,7 @@ def main():
     arguments = arg_parser()
     input_from_file = LanguageDefinition()
     input_from_file.read_input(arguments.input_file_name)
+    new_grammar = Grammar(input_from_file)
 
 
 if __name__ == "__main__":
