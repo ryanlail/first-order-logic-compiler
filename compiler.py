@@ -86,6 +86,10 @@ class LanguageDefinition:
                 line = line.replace("formula: ", "")
                 self.formula = line
 
+            else:
+                # must still be part of formula
+                self.formula += line
+
 class Grammar:
 
     def __init__(self, LanguageDefinition):
@@ -209,7 +213,19 @@ class Grammar:
                 fh.write(rule + "\n")
             fh.write("Start Symbol: " + self.start_symbol + "\n")
 
+class LexicalAnalyser():
 
+    def __init__(self, LanguageDefinition):
+        self.lexeme_stream = LanguageDefinition.formula
+        self.tokenize_stream(LanguageDefinition)
+
+    def tokenize_stream(self, LanguageDefinition):
+        for whitespace in LanguageDefinition.whitespace:
+            self.lexeme_stream = self.lexeme_stream.replace(whitespace, " ")
+        self.lexeme_stream = self.lexeme_stream.replace("(", " ( ")
+        self.lexeme_stream = self.lexeme_stream.replace(")", " ) ")
+        self.lexeme_stream = self.lexeme_stream.replace(",", " , ")
+        split_lexemes = self.lexeme_stream.split()
 
 
 
@@ -231,6 +247,7 @@ def main():
     input_from_file.read_input(arguments.input_file_name)
     new_grammar = Grammar(input_from_file)
     new_grammar.output(arguments.grammar_file_name)
+    lexial_analysis = LexicalAnalyser(input_from_file)
 
 
 if __name__ == "__main__":
