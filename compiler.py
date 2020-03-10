@@ -88,7 +88,7 @@ class LanguageDefinition:
 
 class Grammar:
 
-    def __init__(self, LanguageDefinition):
+    def __init__(self, LanguageDefiniton):
         self.terminals = set()
         self.non_terminals = {"<VARIABLES>", "<CONSTANTS>", "<PREDICATE_NAMES>", "<CONNECTIVES>",
                 "<QUANTIFIERS>", "<PREDICATE>", "<PREDICADE_PARAM>", "<ASSIGNMENT>", "<VAR_CON>",
@@ -101,66 +101,66 @@ class Grammar:
 
     def populate_terminals(self, LanguageDefinition):
         for variable in LanguageDefinition.variables:
-            if variable in self.terminals():
+            if variable in self.terminals:
                 # error
                 pass
             self.terminals.add(variable)
         for constant in LanguageDefinition.constants:
-            if constant in self.terminals():
+            if constant in self.terminals:
                 # error
                 pass
-            self.termainals.add(constant)
+            self.terminals.add(constant)
         for predicate in LanguageDefinition.predicates.keys():
-            if predicate in self.terminals():
+            if predicate in self.terminals:
                 # error
                 pass
             self.terminals.add(predicate)
-        if LanguageDefinition.equality in self.terminals():
+        if LanguageDefinition.equality in self.terminals:
             # error
             pass
         else:
             self.terminals.add(LanguageDefinition.equality)
-        if LanguageDefinition.and in self.terminals():
+        if LanguageDefinition.and_ in self.terminals:
             # error
             pass
         else:
-            self.termianls.add(LanguageDefinition.and_)
-        if LanguageDefinition.or in self.terminals():
+            self.terminals.add(LanguageDefinition.and_)
+        if LanguageDefinition.or_ in self.terminals:
             # error
             pass
         else:
             self.terminals.add(LanguageDefinition.or_)
-        if LanguageDefinition.implies in self.terminals():
+        if LanguageDefinition.implies in self.terminals:
             # error
             pass
         else:
             self.terminals.add(LanguageDefinition.implies)
-        if LanguageDefinition.iff in self.terminals():
+        if LanguageDefinition.iff in self.terminals:
             # error
             pass
         else:
             self.terminals.add(LanguageDefinition.iff)
-        if LanguageDefinition.neg in self.terminals():
+        if LanguageDefinition.neg in self.terminals:
             # error
             pass
         else:
             self.terminals.add(LanguageDefinition.neg)
-        if LanguageDefinition.exists in self.terminals():
+        if LanguageDefinition.exists in self.terminals:
             # error
             pass
         else:
             self.terminals.add(LanguageDefinition.exists)
-        if LanguageDefinition.forall in self.terminals():
+        if LanguageDefinition.forall in self.terminals:
             #error
             pass
         else:
             self.terminals.add(LanguageDefinition.forall)
-        for neccesary_char in LanguageDefinition.neccesary_chars():
-            if neccesary_char in self.terminals():
+        for neccesary_char in LanguageDefinition.neccesary_chars:
+            if neccesary_char in self.terminals:
                 # error
                 pass
             else:
-                self.termainals.add(LanguageDefinition.neccesary_chars)
+                self.terminals.add(LanguageDefinition.neccesary_chars)
 
     def populate_productions(self, LanguageDefinition):
         self.productions.append("<FORMULA> -> <QUANTIFICATION>|<LOGIC>|<ASSIGNMENT>|<PREDICATE>")
