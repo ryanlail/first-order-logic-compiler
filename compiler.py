@@ -217,15 +217,15 @@ class LexicalAnalyser():
 
     def __init__(self, LanguageDefinition):
         self.lexeme_stream = LanguageDefinition.formula
-        self.tokenize_stream(LanguageDefinition)
+        self.sanatized_stream = self.sanatize_stream(LanguageDefinition)
 
-    def tokenize_stream(self, LanguageDefinition):
+    def sanatize_stream(self, LanguageDefinition):
         for whitespace in LanguageDefinition.whitespace:
             self.lexeme_stream = self.lexeme_stream.replace(whitespace, " ")
         self.lexeme_stream = self.lexeme_stream.replace("(", " ( ")
         self.lexeme_stream = self.lexeme_stream.replace(")", " ) ")
         self.lexeme_stream = self.lexeme_stream.replace(",", " , ")
-        split_lexemes = self.lexeme_stream.split()
+        return self.lexeme_stream.split()
 
 
 
