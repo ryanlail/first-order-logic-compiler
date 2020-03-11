@@ -301,6 +301,25 @@ class Compiler():
         else:
             return False
 
+    def assignment(self):
+        if self.tokens[self.lookahead][0] == "(":
+            self.lookahead += 1
+            if self.var_con():
+                if self.tokens[self.lookahead][0] == "<EQUALITY>" :
+                    self.lookahead += 1
+                    if self.var_con():
+                        if self.tokens[self.lookahead][0] == ")":
+                            self.lookahead += 1
+                            return True
+        else:
+            return False
+
+    def predicate(self):
+        if self.tokens[self.lookahead][0] in self.LanguageDefinition.predicates.keys():
+            self.lookahead += 1
+            if self.tokens[self.lookahead][0] == "(":
+                self.lookahead += 1
+
     def quantifiers(self):
         if self.tokens[self.lookahead][0] == "<QUANTIFIERS>":
             self.lookahead += 1
