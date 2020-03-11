@@ -234,9 +234,12 @@ class Compiler():
         self.lexeme_stream = LanguageDefinition.formula
         self.symbol_table = []
         self.tokens = [] # 2d array, token and id
+        self.recursion_stack = []
+
         self.sanatized_stream = self.sanatize_stream(LanguageDefinition)
         self.tokenize(LanguageDefinition)
-        print(self.tokens)
+        self.analysis()
+       # print(self.tokens)
 
     def sanatize_stream(self, LanguageDefinition):
         for whitespace in LanguageDefinition.whitespace:
@@ -271,23 +274,28 @@ class Compiler():
     def analysis(self):
         root = Node("<FORMULA>")
         self.lookahead = 0
-        self.formula()
+        print(self.formula())
 
     def formula(self):
+        self.recursion_stack.append("<FORMULA>")
         if self.quantification():
             return True
         elif self.logic():
-            pass
-        elif self.assignent():
-            pass
+            return True
+        elif self.assignment():
+            return True
         elif self.predicate():
-            pass
+            return True
+        else:
+            return False
 
     def quantification(self):
+        self.recursion_stack.append("<QUANTIFICATION>")
         if self.quantifiers() and self.variables() and self.formula():
             return True
 
     def logic(self):
+        self.recursion_stack.append("<LOGIC>")
         if self.tokens[self.lookahead][0] == "(":
             self.lookahead += 1
             if self.formula() and self.connectives() and self.formula():
@@ -302,6 +310,7 @@ class Compiler():
             return False
 
     def assignment(self):
+        self.recursion_stack.append("<ASSINGMENT>")
         if self.tokens[self.lookahead][0] == "(":
             self.lookahead += 1
             if self.var_con():
@@ -315,9 +324,10 @@ class Compiler():
             return False
 
     def predicate(self):
+        self.recursion_stack.append("<PREDICATE>")
         if self.tokens[self.lookahead][0] in self.LanguageDefinition.predicates.keys():
-            self.lookahead += 1
             arity = self.LanguageDefinition.predicates[self.tokens[self.lookahead][0]]
+            self.lookahead += 1
             if self.tokens[self.lookahead][0] == "(":
                 self.lookahead += 1
                 for i in range(arity - 1):
@@ -334,22 +344,31 @@ class Compiler():
                         return True
 
     def var_con(self):
+        self.recursion_stack.append("<VAR_CON>")
         if self.variables() or self.constants():
             return True
         else:
             return False
 
     def quantifiers(self):
+        self.recursion_stack.append("<QUANTIFIERS>")
         if self.tokens[self.lookahead][0] == "<QUANTIFIERS>":
+            print(self.symbol_table[self.tokens[self.lookahead][1]])
             self.lookahead += 1
             return True
         else:
             return False
 
     def connectives(self):
+        self.recursion_stack.append("<CONNECTIVES>")
         if self.tokens[self.lookahead][0] == "<CONNECTIVES>":
+            self.lookahead += 1
+            return True
+        else:
+            return False
 
     def constants(self):
+        self.recursion_stack.append("<CONSTANTS>")
         if self.tokens[self.lookahead][0] == "<CONSTANTS>":
             self.lookahead += 1
             return True
@@ -357,6 +376,7 @@ class Compiler():
             return False
 
     def variables(self):
+        self.recursion_stack.append("<VARIABLES>")
         if self.tokens[self.lookahead][0] == "<VARIABLES>":
             self.lookahead += 1
             return True
