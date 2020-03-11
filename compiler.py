@@ -317,11 +317,40 @@ class Compiler():
     def predicate(self):
         if self.tokens[self.lookahead][0] in self.LanguageDefinition.predicates.keys():
             self.lookahead += 1
+            arity = self.LanguageDefinition.predicates[self.tokens[self.lookahead][0]]
             if self.tokens[self.lookahead][0] == "(":
                 self.lookahead += 1
+                for i in range(arity - 1):
+                    if self.variables():
+                        if self.tokens[self.lookahead][0] == ",":
+                            self.lookahead += 1
+                        else:
+                            return False
+                    else:
+                        return False
+                if self.variables():
+                    if self.tokens[self.lookahead][0] == ")":
+                        self.lookahead += 1
+                        return True
+
+    def var_con(self):
+        if self.variables() or self.constants():
+            return True
+        else:
+            return False
 
     def quantifiers(self):
         if self.tokens[self.lookahead][0] == "<QUANTIFIERS>":
+            self.lookahead += 1
+            return True
+        else:
+            return False
+
+    def connectives(self):
+        if self.tokens[self.lookahead][0] == "<CONNECTIVES>":
+
+    def constants(self):
+        if self.tokens[self.lookahead][0] == "<CONSTANTS>":
             self.lookahead += 1
             return True
         else:
@@ -333,12 +362,6 @@ class Compiler():
             return True
         else:
             return False
-
-
-
-
-
-
 
 
 def arg_parser():
