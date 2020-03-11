@@ -1,3 +1,4 @@
+from anytree import Node, RenderTree
 import argparse
 import sys
 
@@ -99,9 +100,22 @@ class Grammar:
                 "<LOGIC>", "<FORMULA>", "<QUANTIFICATION>"}
         self.productions = []
         self.start_symbol = "<FORMULA>"
+#        self.transition_graph = nx.Graph()
 
         self.populate_terminals(LanguageDefinition)
         self.populate_productions(LanguageDefinition)
+#        self.populate_tree()
+
+#    def populate_tree(self):
+#        self.transition_graph.add_nodes_from(list(self.non_terminals))
+#        self.transition_graph.add_edge("<FORMULA>", "<QUANTIFICATION>")
+#        self.transition_graph.add_edge("<FORMULA>", "<LOGIC>")
+#        self.transition_graph.add_edge("<FORMULA>", "<ASSIGNMENT>")
+#        self.transition_graph.add_edge("<FORMULA>", "<PREDICATE>")
+#        self.transition_graph.add_edge("<QUANTIFICATION>", "<QUANTIFIERS>")
+#        self.transition
+
+
 
     def populate_terminals(self, LanguageDefinition):
         for variable in LanguageDefinition.variables:
@@ -213,15 +227,16 @@ class Grammar:
                 fh.write(rule + "\n")
             fh.write("Start Symbol: " + self.start_symbol + "\n")
 
-class LexicalAnalyser():
+class Compiler():
 
     def __init__(self, LanguageDefinition):
+        self.LanguageDefinition = LanguageDefinition
         self.lexeme_stream = LanguageDefinition.formula
         self.symbol_table = []
         self.tokens = [] # 2d array, token and id
         self.sanatized_stream = self.sanatize_stream(LanguageDefinition)
-        #print(self.sanatized_stream)
         self.tokenize(LanguageDefinition)
+        print(self.tokens)
 
     def sanatize_stream(self, LanguageDefinition):
         for whitespace in LanguageDefinition.whitespace:
@@ -234,30 +249,75 @@ class LexicalAnalyser():
     def tokenize(self, LanguageDefinition):
         for lexeme in self.sanatized_stream:
             if lexeme in LanguageDefinition.variables:
-                self.tokens.append(["VARIABLE", len(self.symbol_table)])
+                self.tokens.append(["<VARIABLES>", len(self.symbol_table)])
                 self.symbol_table.append(lexeme)
             elif lexeme in LanguageDefinition.constants:
-                self.tokens.append(["CONSTANT", len(self.symbol_table)])
+                self.tokens.append(["<CONSTANTS>", len(self.symbol_table)])
                 self.symbol_table.append(lexeme)
             elif lexeme == LanguageDefinition.equality:
-                self.tokens.append(["EQUALITY"])
-            elif lexeme == LanguageDefinition.and_:
-                self.tokens.append(["AND"])
-            elif lexeme == LanguageDefinition.or_:
-                self.tokens.append(["OR"])
-            elif lexeme == LanguageDefinition.implies:
-                self.tokens.append(["IMPLIES"])
-            elif lexeme == LanguageDefinition.iff:
-                self.tokens.append(["IFF"])
+                self.tokens.append(["<EQUALITY>"])
+            elif (lexeme == LanguageDefinition.and_) or (lexeme == LanguageDefinition.or_) or (lexeme ==
+                    LanguageDefinition.implies) or (lexeme == LanguageDefinition.iff):
+                self.tokens.append(["<CONNECTIVES>", len(self.symbol_table)])
+                self.symbol_table.append(lexeme)
             elif lexeme == LanguageDefinition.neg:
-                self.tokens.append(["NEG"])
-            elif lexeme == LanguageDefinition.exists:
-                self.tokens.append(["EXISTS"])
-            elif lexeme == LanguageDefinition.forall:
-                self.tokens.append(["FORALL"])
+                self.tokens.append(["<NEG>"])
+            elif lexeme == LanguageDefinition.exists or lexeme == LanguageDefinition.forall:
+                self.tokens.append(["<QUANTIFIERS>", len(self.symbol_table)])
+                self.symbol_table.append(lexeme)
             else:
                 self.tokens.append([lexeme])
-        print(self.tokens)
+
+    def analysis(self):
+        root = Node("<FORMULA>")
+        self.lookahead = 0
+        self.formula()
+
+    def formula(self):
+        if self.quantification():
+            return True
+        elif self.logic():
+            pass
+        elif self.assignent():
+            pass
+        elif self.predicate():
+            pass
+
+    def quantification(self):
+        if self.quantifiers() and self.variables() and self.formula():
+            return True
+
+    def logic(self):
+        if self.tokens[self.lookahead][0] == "(":
+            self.lookahead += 1
+            if self.formula() and self.connectives() and self.formula():
+                if self.tokens[self.lookahead][0] == ")":
+                    self.lookahead += 1
+                    return True
+        elif self.tokens[self.lookahead][0] == "<NEG>":
+            self.lookahead += 1
+            if self.formula():
+                return True
+        else:
+            return False
+
+    def quantifiers(self):
+        if self.tokens[self.lookahead][0] == "<QUANTIFIERS>":
+            self.lookahead += 1
+            return True
+        else:
+            return False
+
+    def variables(self):
+        if self.tokens[self.lookahead][0] == "<VARIABLES>":
+            self.lookahead += 1
+            return True
+        else:
+            return False
+
+
+
+
 
 
 
@@ -280,7 +340,7 @@ def main():
     input_from_file.read_input(arguments.input_file_name)
     new_grammar = Grammar(input_from_file)
     new_grammar.output(arguments.grammar_file_name)
-    lexial_analysis = LexicalAnalyser(input_from_file)
+    lexial_analysis = Compiler(input_from_file)
 
 
 if __name__ == "__main__":
