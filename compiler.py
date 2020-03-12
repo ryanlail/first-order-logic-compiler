@@ -228,12 +228,12 @@ class Compiler():
 
         self.sanatized_stream = self.sanatize_stream(LanguageDefinition)
         self.tokenize(LanguageDefinition)
-        self.analysis()
+        self.analysis(parse_tree_name)
 
         #for pre, fill, node in RenderTree(self.recursion_stack[0]):
         #    print("%s%s" % (pre, node.name))
 
-        UniqueDotExporter(self.recursion_stack[0]).to_picture(parse_tree_name)
+        #UniqueDotExporter(self.recursion_stack[0]).to_picture(parse_tree_name)
 
     def sanatize_stream(self, LanguageDefinition):
         for whitespace in LanguageDefinition.whitespace:
@@ -265,9 +265,10 @@ class Compiler():
             else:
                 self.tokens.append([lexeme])
 
-    def analysis(self):
+    def analysis(self, parse_tree_name):
         self.lookahead = 0
-        self.formula(None)
+        if self.formula(None):
+            UniqueDotExporter(self.recursion_stack[0]).to_picture(parse_tree_name)
 
     def formula(self, caller):
         self.recursion_stack.append(Node("<FORMULA>", parent = caller))
@@ -423,7 +424,7 @@ def arg_parser():
     parser.add_argument("-g", "--grammar_file_name", type = str, default = "grammar.txt",
             help = "Name of the output file for the definition of the grammar")
     parser.add_argument("-t", "--parse_tree_file_name", type = str, default = "tree.png", help = "Name of the output parse tree (png)")
-   # parser.add_argument("log_file_name", type = str, default = "log.txt", help = "Name of the log file")
+    parser.add_argument("-l", "--log_file_name", type = str, default = "log.txt", help = "Name of the log file")
 
     return parser.parse_args()
 
