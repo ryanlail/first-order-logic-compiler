@@ -243,7 +243,7 @@ class Compiler():
 
         for pre, fill, node in RenderTree(self.recursion_stack[0]):
             print("%s%s" % (pre, node.name))
-       # print(self.tokens)
+        print(self.tokens)
 
     def sanatize_stream(self, LanguageDefinition):
         for whitespace in LanguageDefinition.whitespace:
@@ -309,14 +309,14 @@ class Compiler():
         self.recursion_stack.append(Node("<LOGIC>", parent = caller))
         current = self.recursion_stack[-1]
         #self.recursion_stack.append("<LOGIC>")
-        if self.tokens[self.lookahead][0] == "(":
+        if self.tokens[self.lookahead][0] == "(" and (self.tokens[self.lookahead + 2][0] != "<EQUALITY>"): # must look a head to check not assignment
             self.lookahead += 1
             if self.formula(current) and self.connectives(current) and self.formula(current):
                 if self.tokens[self.lookahead][0] == ")":
                     self.lookahead += 1
                     return True
         elif self.tokens[self.lookahead][0] == "<NEG>":
-            self.recursion_stack.append(Node("<NEG>", parent = caller))
+            self.recursion_stack.append(Node(self.LanguageDefinition.neg, parent = self.recursion_stack[-1]))
             self.lookahead += 1
             if self.formula(current):
                 return True
@@ -326,6 +326,7 @@ class Compiler():
 
     def assignment(self, caller):
         self.recursion_stack.append(Node("<ASSIGNMENT>", parent = caller))
+        print(self.tokens[self.lookahead][0])
         current = self.recursion_stack[-1]
         # self.recursion_stack.append("<ASSINGMENT>")
         if self.tokens[self.lookahead][0] == "(":
@@ -347,6 +348,7 @@ class Compiler():
         current = self.recursion_stack[-1]
         # self.recursion_stack.append("<PREDICATE>")
         if self.tokens[self.lookahead][0] in self.LanguageDefinition.predicates.keys():
+            self.recursion_stack.append(Node(self.tokens[self.lookahead][0], parent = self.recursion_stack[-1]))
             arity = self.LanguageDefinition.predicates[self.tokens[self.lookahead][0]]
             self.lookahead += 1
             if self.tokens[self.lookahead][0] == "(":
@@ -374,7 +376,7 @@ class Compiler():
 
     def var_con(self, caller):
         self.recursion_stack.append(Node("<VAR_CON>", parent = caller))
-        current = self.recurstion_stack[-1]
+        current = self.recursion_stack[-1]
         #self.recursion_stack.append("<VAR_CON>")
         if self.variables(current) or self.constants(current):
             return True
@@ -387,6 +389,7 @@ class Compiler():
         #self.recursion_stack.append("<QUANTIFIERS>")
         if self.tokens[self.lookahead][0] == "<QUANTIFIERS>":
            # print(self.symbol_table[self.tokens[self.lookahead][1]])
+            self.recursion_stack.append(Node(self.symbol_table[self.tokens[self.lookahead][1]], parent = self.recursion_stack[-1]))
             self.lookahead += 1
             return True
         else:
@@ -397,6 +400,7 @@ class Compiler():
         self.recursion_stack.append(Node("<CONNECTIVES>", parent = caller))
         #self.recursion_stack.append("<CONNECTIVES>")
         if self.tokens[self.lookahead][0] == "<CONNECTIVES>":
+            self.recursion_stack.append(Node(self.symbol_table[self.tokens[self.lookahead][1]], parent = self.recursion_stack[-1]))
             self.lookahead += 1
             return True
         else:
@@ -407,6 +411,7 @@ class Compiler():
         self.recursion_stack.append(Node("<CONSTANTS>", parent = caller))
         #self.recursion_stack.append("<CONSTANTS>")
         if self.tokens[self.lookahead][0] == "<CONSTANTS>":
+            self.recursion_stack.append(Node(self.symbol_table[self.tokens[self.lookahead][1]], parent = self.recursion_stack[-1]))
             self.lookahead += 1
             return True
         else:
@@ -417,6 +422,7 @@ class Compiler():
         self.recursion_stack.append(Node("<VARIABLES>", parent = caller))
         #self.recursion_stack.append("<VARIABLES>")
         if self.tokens[self.lookahead][0] == "<VARIABLES>":
+            self.recursion_stack.append(Node(self.symbol_table[self.tokens[self.lookahead][1]], parent = self.recursion_stack[-1]))
             self.lookahead += 1
             return True
         else:
