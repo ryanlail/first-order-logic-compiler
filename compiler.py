@@ -305,9 +305,11 @@ class Compiler():
         self.recursion_stack.append(Node("<LOGIC>", parent = caller))
         current = self.recursion_stack[-1]
         if self.tokens[self.lookahead][0] == "(" and (self.tokens[self.lookahead + 2][0] != "<EQUALITY>"): # must look a head to check not equality
+            self.recursion_stack.append(Node("(", parent = current))
             self.lookahead += 1
             if self.formula(current) and self.connectives(current) and self.formula(current):
                 if self.tokens[self.lookahead][0] == ")":
+                    self.recursion_stack.append(Node(")", parent = current))
                     self.lookahead += 1
                     return True
         elif self.tokens[self.lookahead][0] == "<NEG>":
@@ -323,6 +325,7 @@ class Compiler():
         self.recursion_stack.append(Node("<EQUALITY>", parent = caller))
         current = self.recursion_stack[-1]
         if self.tokens[self.lookahead][0] == "(":
+            self.recursion_stack.append(Node("(", parent = current))
             self.lookahead += 1
             if self.var_con(current):
                 if self.tokens[self.lookahead][0] == "<EQUALITY>" :
@@ -330,6 +333,7 @@ class Compiler():
                     self.lookahead += 1
                     if self.var_con(current):
                         if self.tokens[self.lookahead][0] == ")":
+                            self.recursion_stack.append(Node(")", parent = current))
                             self.lookahead += 1
                             return True
         else:
@@ -344,10 +348,12 @@ class Compiler():
             arity = self.LanguageDefinition.predicates[self.tokens[self.lookahead][0]]
             self.lookahead += 1
             if self.tokens[self.lookahead][0] == "(":
+                self.recursion_stack.append(Node("(", parent = current))
                 self.lookahead += 1
                 for i in range(arity - 1):
                     if self.variables(current):
                         if self.tokens[self.lookahead][0] == ",":
+                            self.recursion_stack.append(Node(",", parent = current))
                             self.lookahead += 1
                         else:
                             self.recursion_stack.pop().parent = None
@@ -357,6 +363,7 @@ class Compiler():
                         return False
                 if self.variables(current):
                     if self.tokens[self.lookahead][0] == ")":
+                        self.recursion_stack.append(Node(")", parent = current))
                         self.lookahead += 1
                         return True
                     else:
