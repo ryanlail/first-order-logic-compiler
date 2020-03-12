@@ -219,7 +219,7 @@ class Grammar:
 
 class Compiler():
 
-    def __init__(self, LanguageDefinition):
+    def __init__(self, LanguageDefinition, parse_tree_name):
         self.LanguageDefinition = LanguageDefinition
         self.lexeme_stream = LanguageDefinition.formula
         self.symbol_table = []
@@ -230,11 +230,10 @@ class Compiler():
         self.tokenize(LanguageDefinition)
         self.analysis()
 
-        for pre, fill, node in RenderTree(self.recursion_stack[0]):
-            print("%s%s" % (pre, node.name))
+        #for pre, fill, node in RenderTree(self.recursion_stack[0]):
+        #    print("%s%s" % (pre, node.name))
 
-       # RenderTreeGraph(self.recursion_stack[0]).to_picture("tree.png")
-        UniqueDotExporter(self.recursion_stack[0]).to_picture("tree2.png")
+        UniqueDotExporter(self.recursion_stack[0]).to_picture(parse_tree_name)
 
     def sanatize_stream(self, LanguageDefinition):
         for whitespace in LanguageDefinition.whitespace:
@@ -423,7 +422,7 @@ def arg_parser():
             help = "Name of the input file to read language definitons and formula from")
     parser.add_argument("-g", "--grammar_file_name", type = str, default = "grammar.txt",
             help = "Name of the output file for the definition of the grammar")
-   # parser.add_argument("parse_tree_file_name", type = str, default = "tree.png", help = "Name of the output parse tree")
+    parser.add_argument("-t", "--parse_tree_file_name", type = str, default = "tree.png", help = "Name of the output parse tree (png)")
    # parser.add_argument("log_file_name", type = str, default = "log.txt", help = "Name of the log file")
 
     return parser.parse_args()
@@ -434,8 +433,7 @@ def main():
     input_from_file.read_input(arguments.input_file_name)
     new_grammar = Grammar(input_from_file)
     new_grammar.output(arguments.grammar_file_name)
-    lexial_analysis = Compiler(input_from_file)
-
+    parse = Compiler(input_from_file, arguments.parse_tree_file_name)
 
 if __name__ == "__main__":
     main()
