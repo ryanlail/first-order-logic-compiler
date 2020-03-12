@@ -32,6 +32,11 @@ class LanguageDefinition:
                 line = line.replace("variables: ", "")
                 line = line.split()
                 for variable in line:
+                    for char in variable:
+                        if not(char.isalnum()) and char != "_":
+                            with open(log_file, "a") as fh:
+                                fh.write("ERROR reading in file: \n VARIABLE " + variable + " contains invalid character " + char)
+                                sys.exit(1)
                     if variable in self.variables or variable in self.constants or variable in self.predicates.keys():
                         with open(log_file, "a") as fh:
                             fh.write("ERROR reading in file: \n VARIABLE " + variable + " is a repeated identifier")
@@ -46,10 +51,15 @@ class LanguageDefinition:
                 line = line.replace("constants: ", "")
                 line = line.split()
                 for constant in line:
+                    for char in constant:
+                        if not(char.isalnum()) and char != "_":
+                            with open(log_file, "a") as fh:
+                                fh.write("ERROR reading in file: \n CONSTANT " + constant + " contains invalid character " + char)
+                                sys.exit(1)
                     if constant in self.variables or constant in self.constants or constant in self.predicates.keys():
                         with open(log_file, "a") as fh:
                             fh.write("ERROR reading in file: \n CONSTANT " + constant + " is a repeated identifier")
-                        sys.exit(1)
+                            sys.exit(1)
                     elif constant == self.equality or constant == self.and_ or constant == self.or_ or constant == self.implies or constant == self.iff or constant == self.neg or constant == self.exists or constant == self.forall:
                         with open(log_file, "a") as fh:
                             fh.write("ERROR reading in file: \n CONSTANT" + constant + " is a reserved string with input language")
@@ -63,23 +73,37 @@ class LanguageDefinition:
                     predicate_name = ""
                     predicate_arity = ""
                     count = 0
-                    while predicate[count] != '[':
-                        predicate_name += predicate[count]
+                    try:
+                        while predicate[count] != '[':
+                            predicate_name += predicate[count]
+                            if not(predicate[count].isalnum()) and predicate[count] != "_":
+                                with open(log_file, "a") as fh:
+                                    fh.write("ERROR reading in file: \n PREDICATE starting " + predicate_name + " contains inalid character " + predicate[count])
+                                    sys.exit(1)
+                            count += 1
                         count += 1
-                    count += 1
-                    if predicate_name in self.variables or predicate_name in self.constants or predicate_name in self.predicates.keys():
-                        with open(log_file, "a") as fh:
-                            fh.write("ERROR reading in file: \n PREDICATE " + predicate + " is a repeated identifier")
-                        sys.exit(1)
-
-                    elif predicate_name == self.equality or predicate_name == self.and_ or predicate_name == self.or_ or predicate_name == self.implies or predicate_name == self.iff or predicate_name == self.neg or predicate_name == self.exists or predicate_name == self.forall:
-                        with open(log_file, "a") as fh:
-                            fh.write("ERROR reading in file: \n PREDICATE" + predicate_name + " is a reserved string with input language")
+                        if predicate_name in self.variables or predicate_name in self.constants or predicate_name in self.predicates.keys():
+                            with open(log_file, "a") as fh:
+                                fh.write("ERROR reading in file: \n PREDICATE " + predicate + " is a repeated identifier")
                             sys.exit(1)
-                    while predicate[count] != ']':
-                        predicate_arity += predicate[count]
-                        count += 1
-                    self.predicates[predicate_name] = int(predicate_arity)
+
+                        elif predicate_name == self.equality or predicate_name == self.and_ or predicate_name == self.or_ or predicate_name == self.implies or predicate_name == self.iff or predicate_name == self.neg or predicate_name == self.exists or predicate_name == self.forall:
+                            with open(log_file, "a") as fh:
+                                fh.write("ERROR reading in file: \n PREDICATE" + predicate_name + " is a reserved string with input language")
+                                sys.exit(1)
+                        while predicate[count] != ']':
+                            predicate_arity += predicate[count]
+                            count += 1
+                        try:
+                            self.predicates[predicate_name] = int(predicate_arity)
+                        except:
+                            with open(log_file, "a") as fh:
+                                fh.write("ERROR reading in file: \n PREDICATE " + predicate_name + " arity is not a number")
+                                sys.exit(1)
+                    except:
+                        with open(log_file, "a") as fh:
+                            fh.write("ERROR reading in file: \n PREDICATE definition is malformed! Must follow format:  Predicate_Name[arity]")
+                            sys.exit(1)
 
             elif line.startswith("equality:"):
                 line = line.replace("equality: ", "")
