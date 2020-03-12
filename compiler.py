@@ -1,6 +1,7 @@
 from anytree import Node, RenderTree
 from anytree.dotexport import RenderTreeGraph
 from anytree.exporter import UniqueDotExporter
+from datetime import datetime
 import argparse
 import sys
 import re
@@ -217,7 +218,7 @@ class Grammar:
                 "<LOGIC>", "<FORMULA>", "<QUANTIFICATION>"}
         if len(LanguageDefinition.variables) == 0:
             self.non_terminals.remove("<VARIABLES>")
-        if len(LanguageDefinition.constants == 0):
+        if len(LanguageDefinition.constants) == 0:
             self.non_terminals.remove("<CONSTANTS>")
         if len(LanguageDefinition.predicates.keys()) == 0:
             self.non_terminals.remove("<PREDICATE>")
@@ -247,13 +248,13 @@ class Grammar:
             self.terminals.add(neccesary_char)
 
     def populate_productions(self, LanguageDefinition):
-        self.productions.append("<FORMULA> -> <QUANTIFICATION> | <LOGIC> | <EQUALITY> | <PREDICATE>")
-        self.productions.append("<QUANTIFICATION> -> <QUANTIFIERS> <VARIABLES> <FORMULA>")
-        self.productions.append("<LOGIC> -> (<FORMULA> <CONNECTIVES> <FORMULA>) | " + LanguageDefinition.neg +
+        self.productions.append("<FORMULA> ->  <QUANTIFICATION> | <LOGIC> | <EQUALITY> | <PREDICATE>")
+        self.productions.append("<QUANTIFICATION> ->  <QUANTIFIERS> <VARIABLES> <FORMULA>")
+        self.productions.append("<LOGIC> ->  (<FORMULA> <CONNECTIVES> <FORMULA>) | " + LanguageDefinition.neg +
                 " <FORMULA>")
-        self.productions.append("<EQUALITY> -> (<VAR_CON> " + LanguageDefinition.equality + " <VAR_CON>)")
+        self.productions.append("<EQUALITY> ->  (<VAR_CON> " + LanguageDefinition.equality + " <VAR_CON>)")
 
-        predicate_rule = "<PREDICATE> -> "
+        predicate_rule = "<PREDICATE> ->  "
         for predicate in LanguageDefinition.predicates.keys():
             predicate_rule += predicate + "("
             for arity in range(LanguageDefinition.predicates[predicate]):
@@ -262,18 +263,18 @@ class Grammar:
             predicate_rule += ") | "
         self.productions.append(predicate_rule[:-2])
 
-        self.productions.append("<VAR_CON> -> <VARIABLES> | <CONSTANTS>")
-        self.productions.append("<QUANTIFIERS> -> " + LanguageDefinition.exists + " | " +
+        self.productions.append("<VAR_CON> ->  <VARIABLES> | <CONSTANTS>")
+        self.productions.append("<QUANTIFIERS> ->  " + LanguageDefinition.exists + " | " +
                 LanguageDefinition.forall)
-        self.productions.append("<CONNECTIVES> -> " + LanguageDefinition.and_ + " | " + LanguageDefinition.or_ +
+        self.productions.append("<CONNECTIVES> ->  " + LanguageDefinition.and_ + " | " + LanguageDefinition.or_ +
                 " | " + LanguageDefinition.implies + " | " + LanguageDefinition.iff)
 
-        constants_rule = "<CONSTANTS> -> "
+        constants_rule = "<CONSTANTS> ->  "
         for constant in LanguageDefinition.constants:
             constants_rule += constant + " | "
         self.productions.append(constants_rule[:-2])
 
-        variables_rule = "<VARIABLES> -> "
+        variables_rule = "<VARIABLES> ->  "
         for variable in LanguageDefinition.variables:
             variables_rule += variable + " | "
         self.productions.append(variables_rule[:-2])
@@ -296,15 +297,17 @@ class Grammar:
 class Compiler():
 
     def __init__(self, LanguageDefinition, parse_tree_name, log_file):
+        self.log_file = log_file
         self.LanguageDefinition = LanguageDefinition
         self.lexeme_stream = LanguageDefinition.formula
         self.symbol_table = []
         self.tokens = [] # 2d array, token and id
         self.recursion_stack = []
+        self.expecting = ""
 
         self.sanatized_stream = self.sanatize_stream(LanguageDefinition)
         self.tokenize(LanguageDefinition)
-        self.analysis(parse_tree_name, log_file)
+        self.analysis(parse_tree_name)
 
         #for pre, fill, node in RenderTree(self.recursion_stack[0]):
         #    print("%s%s" % (pre, node.name))
@@ -341,12 +344,15 @@ class Compiler():
             else:
                 self.tokens.append([lexeme])
 
-    def analysis(self, parse_tree_name, log_file):
+    def analysis(self, parse_tree_name):
         self.lookahead = 0
         if self.formula(None):
             UniqueDotExporter(self.recursion_stack[0]).to_picture(parse_tree_name)
-            with open(log_file, "a") as fh:
-                fh.write("PASS\n")
+            with open(self.log_file, "a") as fh:
+                fh.write("PASS\n\n\n")
+        else:
+            with open(self.log_file, "a") as fh:
+                fh.write("FAIL\n\n")
 
     def formula(self, caller):
         self.recursion_stack.append(Node("<FORMULA>", parent = caller))
@@ -361,6 +367,14 @@ class Compiler():
             return True
         else:
             self.recursion_stack.pop().parent = None
+            try:
+                bad_value = self.symbol_table[self.tokens[self.lookahead][1]]
+            except:
+                bad_value = self.tokens[self.lookahead][0]
+            with open(self.log_file, "a") as fh:
+                fh.write("Unexpected character at pos " + str(self.lookahead + 1) + " - " + bad_value + " EXPECTED " + self.expecting + "\n")
+                fh.write("FAIL\n\n\n")
+                sys.exit(1)
             return False
 
     def quantification(self, caller):
@@ -407,6 +421,11 @@ class Compiler():
                             self.recursion_stack.append(Node(")", parent = current))
                             self.lookahead += 1
                             return True
+
+                else:
+                    self.recursion_stack.pop().parent = None
+                    self.expecting = "EQUALITY"
+                    return False
         else:
             self.recursion_stack.pop().parent = None
             return False
@@ -443,6 +462,10 @@ class Compiler():
                 else:
                     self.recursion_stack.pop().parent = None
                     return False
+        else:
+            self.recursion_stack.pop().parent = None
+            self.expecting = "PREDICATE"
+            return False
 
     def var_con(self, caller):
         self.recursion_stack.append(Node("<VAR_CON>", parent = caller))
@@ -461,6 +484,7 @@ class Compiler():
             return True
         else:
             self.recursion_stack.pop().parent = None
+            self.expecting = "QUANTIFIER"
             return False
 
     def connectives(self, caller):
@@ -471,6 +495,7 @@ class Compiler():
             return True
         else:
             self.recursion_stack.pop().parent = None
+            self.expecting = "CONNECTIVE"
             return False
 
     def constants(self, caller):
@@ -481,6 +506,7 @@ class Compiler():
             return True
         else:
             self.recursion_stack.pop().parent = None
+            self.expecting = "CONSTANT"
             return False
 
     def variables(self, caller):
@@ -491,6 +517,7 @@ class Compiler():
             return True
         else:
             self.recursion_stack.pop().parent = None
+            self.expecting = "VARIABLE"
             return False
 
 
@@ -508,8 +535,9 @@ def arg_parser():
 
 def main():
     arguments = arg_parser()
-    with open(arguments.log_file_name, "w") as fh:
-        fh.write("Log file for input: " + arguments.input_file_name + "\n")
+    with open(arguments.log_file_name, "a") as fh:
+        now = str(datetime.now())
+        fh.write(now + "\nLog file for input: " + arguments.input_file_name + "\n")
     input_from_file = LanguageDefinition()
     input_from_file.read_input(arguments.input_file_name, arguments.log_file_name)
     new_grammar = Grammar(input_from_file)
