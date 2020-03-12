@@ -11,36 +11,52 @@ class LanguageDefinition:
         self.variables = []
         self.constants = []
         self.predicates = {} # hash table (predicate -> arity)
-        self.equality = r""
-        self.and_ = r""
-        self.or_ = r""
-        self.implies = r""
-        self.iff = r""
-        self.neg = r""
-        self.exists = r""
-        self.forall = r""
+        self.equality = ""
+        self.and_ = ""
+        self.or_ = ""
+        self.implies = ""
+        self.iff = ""
+        self.neg = ""
+        self.exists = ""
+        self.forall = ""
         self.whitespace = [" ", "\n", "\t"]
         self.neccesary_chars = ["(", ")", ","]
         self.formula = ""
 
-    def read_input(self, input_file_name):
+    def read_input(self, input_file_name, log_file):
         with open(input_file_name) as fh:
             lines = fh.read().splitlines()
 
         for line in lines:
-            if line.startswith("variables"):
+            if line.startswith("variables: "): # only if there ARE vars defined (via the space)
                 line = line.replace("variables: ", "")
                 line = line.split()
                 for variable in line:
+                    if variable in self.variables or variable in self.constants or variable in self.predicates.keys():
+                        with open(log_file, "a") as fh:
+                            fh.write("ERROR reading in file: \n VARIABLE " + variable + " is a repeated identifier")
+                        sys.exit(1)
+                    elif variable == self.equality or variable == self.and_ or variable == self.or_ or variable == self.implies or variable == self.iff or variable == self.neg or variable == self.exists or variable == self.forall:
+                        with open(log_file, "a") as fh:
+                            fh.write("ERROR reading in file: \n VARIABLE" + variable + " is a reserved string with input language")
+                            sys.exit(1)
                     self.variables.append(variable)
 
-            elif line.startswith("constants"):
+            elif line.startswith("constants: "):
                 line = line.replace("constants: ", "")
                 line = line.split()
                 for constant in line:
+                    if constant in self.variables or constant in self.constants or constant in self.predicates.keys():
+                        with open(log_file, "a") as fh:
+                            fh.write("ERROR reading in file: \n CONSTANT " + constant + " is a repeated identifier")
+                        sys.exit(1)
+                    elif constant == self.equality or constant == self.and_ or constant == self.or_ or constant == self.implies or constant == self.iff or constant == self.neg or constant == self.exists or constant == self.forall:
+                        with open(log_file, "a") as fh:
+                            fh.write("ERROR reading in file: \n CONSTANT" + constant + " is a reserved string with input language")
+                            sys.exit(1)
                     self.constants.append(constant)
 
-            elif line.startswith("predicates"):
+            elif line.startswith("predicates: "):
                 line = line.replace("predicates: ", "")
                 line = line.split()
                 for predicate in line:
@@ -51,40 +67,114 @@ class LanguageDefinition:
                         predicate_name += predicate[count]
                         count += 1
                     count += 1
+                    if predicate_name in self.variables or predicate_name in self.constants or predicate_name in self.predicates.keys():
+                        with open(log_file, "a") as fh:
+                            fh.write("ERROR reading in file: \n PREDICATE " + predicate + " is a repeated identifier")
+                        sys.exit(1)
+
+                    elif predicate_name == self.equality or predicate_name == self.and_ or predicate_name == self.or_ or predicate_name == self.implies or predicate_name == self.iff or predicate_name == self.neg or predicate_name == self.exists or predicate_name == self.forall:
+                        with open(log_file, "a") as fh:
+                            fh.write("ERROR reading in file: \n PREDICATE" + predicate_name + " is a reserved string with input language")
+                            sys.exit(1)
                     while predicate[count] != ']':
                         predicate_arity += predicate[count]
                         count += 1
                     self.predicates[predicate_name] = int(predicate_arity)
 
-            elif line.startswith("equality"):
+            elif line.startswith("equality:"):
                 line = line.replace("equality: ", "")
-                if len(line) == 0:
-                    # error
-                    pass
-                self.equality += line
+                if len(line.split()) != 1:
+                    with open(log_file, "a") as fh:
+                        fh.write("ERROR reading in file: \n Expected 1 equality symbol, recieved " + str(len(line.split())))
+                elif line in self.variables or line in self.constants or line in self.predicates.keys():
+                    with open(log_file, "a") as fh:
+                        fh.write("ERROR reading in file: \n Symbol " + line + " is a reserved string with input language")
+                        sys.exit(1)
+                elif line == self.and_ or line == self.or_ or line  == self.implies or line == self.iff or line == self.neg or line == self.exists or line == self.forall:
+                    with open(log_file, "a") as fh:
+                        fh.write("ERROR reading in file: \n EQUALITY " + line + " is already a different reserved string")
+                        sys.exit(1)
+                else:
+                    self.equality = line
 
             elif line.startswith("connectives"):
                 line = line.replace("connectives: ", "")
                 line = line.split()
-                try:
-                    self.and_ += line[0]
-                    self.or_ += line[1]
-                    self.implies += line[2]
-                    self.iff += line[3]
-                    self.neg += line[4]
-                except:
-                    #error
-                    pass
+                if len(line) == 5:
+                    self.and_ = line[0]
+                    if self.and_ in self.variables or self.and_ in self.constants or self.and_ in self.predicates.keys():
+                        with open(log_file, "a") as fh:
+                            fh.write("ERROR reading in file: \n Symbol " + self.and_ + " is a reserved string with input language")
+                            sys.exit(1)
+                    elif self.and_ == self.equality or self.and_ == self.or_ or self.and_  == self.implies or self.and_ == self.iff or self.and_ == self.neg or self.and_ == self.exists or self.and_ == self.forall:
+                        with open(log_file, "a") as fh:
+                            fh.write("ERROR reading in file: \n AND " + self.and_ + " is already a different reserved string")
+                            sys.exit(1)
+                    self.or_ = line[1]
+                    if self.or_ in self.variables or self.or_ in self.constants or self.or_ in self.predicates.keys():
+                        with open(log_file, "a") as fh:
+                            fh.write("ERROR reading in file: \n Symbol " + self.or_ + " is a reserved string with input language")
+                            sys.exit(1)
+                    elif self.or_ == self.equality or self.and_ == self.or_ or self.or_  == self.implies or self.or_ == self.iff or self.or_ == self.neg or self.or_ == self.exists or self.or_ == self.forall:
+                        with open(log_file, "a") as fh:
+                            fh.write("ERROR reading in file: \n OR " + self.and_ + " is already a different reserved string")
+                            sys.exit(1)
+                    self.implies = line[2]
+                    if self.implies in self.variables or self.implies in self.constants or self.implies in self.predicates.keys():
+                        with open(log_file, "a") as fh:
+                            fh.write("ERROR reading in file: \n Symbol " + self.implies + " is a reserved string with input language")
+                            sys.exit(1)
+                    elif self.implies == self.equality or self.implies == self.or_ or self.and_  == self.implies or self.implies == self.iff or self.implies == self.neg or self.implies == self.exists or self.implies == self.forall:
+                        with open(log_file, "a") as fh:
+                            fh.write("ERROR reading in file: \n IMPLIES " + self.implies + " is already a different reserved string")
+                            sys.exit(1)
+                    self.iff = line[3]
+                    if self.iff in self.variables or self.iff in self.constants or self.iff in self.predicates.keys():
+                        with open(log_file, "a") as fh:
+                            fh.write("ERROR reading in file: \n Symbol " + self.iff + " is a reserved string with input language")
+                            sys.exit(1)
+                    elif self.iff == self.equality or self.iff == self.or_ or self.iff  == self.implies or self.and_ == self.iff or self.iff == self.neg or self.iff == self.exists or self.iff == self.forall:
+                        with open(log_file, "a") as fh:
+                            fh.write("ERROR reading in file: \n IFF " + self.iff + " is already a different reserved string")
+                            sys.exit(1)
+                    self.neg = line[4]
+                    if self.neg in self.variables or self.neg in self.constants or self.neg in self.predicates.keys():
+                        with open(log_file, "a") as fh:
+                            fh.write("ERROR reading in file: \n Symbol " + self.neg + " is a reserved string with input language")
+                            sys.exit(1)
+                    elif self.neg == self.equality or self.neg == self.or_ or self.neg  == self.implies or self.neg == self.iff or self.and_ == self.neg or self.neg == self.exists or self.neg == self.forall:
+                        with open(log_file, "a") as fh:
+                            fh.write("ERROR reading in file: \n NEG " + self.neg + " is already a different reserved string")
+                            sys.exit(1)
+                else:
+                    with open(log_file, "w") as fh:
+                        fh.write("ERROR reading in file: \n Expected 5 connectives, recieved " + str(len(line)))
 
             elif line.startswith("quantifiers"):
                 line = line.replace("quantifiers: ", "")
                 line = line.split()
-                try:
-                    self.exists += line[0]
-                    self.forall += line[1]
-                except:
-                    # error
-                    pass
+                if len(line) == 2:
+                    self.exists = line[0]
+                    if self.exists in self.variables or self.exists in self.constants or self.exists in self.predicates.keys():
+                        with open(log_file, "a") as fh:
+                            fh.write("ERROR reading in file: \n Symbol " + self.exists + " is a reserved string with input language")
+                            sys.exit(1)
+                    elif self.exists == self.equality or self.exists == self.or_ or self.exists  == self.implies or self.exists == self.iff or self.exists == self.neg or self.and_ == self.exists or self.exists == self.forall:
+                        with open(log_file, "a") as fh:
+                            fh.write("ERROR reading in file: \n EXISTS " + self.exists + " is already a different reserved string")
+                            sys.exit(1)
+                    self.forall = line[1]
+                    if self.forall in self.variables or self.forall in self.constants or self.forall in self.predicates.keys():
+                        with open(log_file, "a") as fh:
+                            fh.write("ERROR reading in file: \n Symbol " + self.forall + " is a reserved string with input language")
+                            sys.exit(1)
+                    elif self.forall == self.equality or self.forall == self.or_ or self.forall  == self.implies or self.forall == self.iff or self.forall == self.neg or self.forall == self.exists or self.and_ == self.forall:
+                        with open(log_file, "a") as fh:
+                            fh.write("ERROR reading in file: \n FORALL " + self.forall + " is already a different reserved string")
+                            sys.exit(1)
+                else:
+                    with open(log_file, "w") as fh:
+                        fh.write("ERROR reading in file: \n Expected 2 quantifiers, recieved " + str(len(line)))
 
             elif line.startswith("formula"):
                 line = line.replace("formula: ", "")
@@ -430,8 +520,10 @@ def arg_parser():
 
 def main():
     arguments = arg_parser()
+    with open(arguments.log_file_name, "w") as fh:
+        fh.write("Log file for input: " + arguments.input_file_name)
     input_from_file = LanguageDefinition()
-    input_from_file.read_input(arguments.input_file_name)
+    input_from_file.read_input(arguments.input_file_name, arguments.log_file_name)
     new_grammar = Grammar(input_from_file)
     new_grammar.output(arguments.grammar_file_name)
     parse = Compiler(input_from_file, arguments.parse_tree_file_name)
