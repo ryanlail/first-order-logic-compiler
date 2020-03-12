@@ -333,7 +333,7 @@ class Grammar:
 
 class Compiler():
 
-    def __init__(self, LanguageDefinition, parse_tree_name):
+    def __init__(self, LanguageDefinition, parse_tree_name, log_file):
         self.LanguageDefinition = LanguageDefinition
         self.lexeme_stream = LanguageDefinition.formula
         self.symbol_table = []
@@ -342,7 +342,7 @@ class Compiler():
 
         self.sanatized_stream = self.sanatize_stream(LanguageDefinition)
         self.tokenize(LanguageDefinition)
-        self.analysis(parse_tree_name)
+        self.analysis(parse_tree_name, log_file)
 
         #for pre, fill, node in RenderTree(self.recursion_stack[0]):
         #    print("%s%s" % (pre, node.name))
@@ -379,10 +379,12 @@ class Compiler():
             else:
                 self.tokens.append([lexeme])
 
-    def analysis(self, parse_tree_name):
+    def analysis(self, parse_tree_name, log_file):
         self.lookahead = 0
         if self.formula(None):
             UniqueDotExporter(self.recursion_stack[0]).to_picture(parse_tree_name)
+            with open(log_file, "a") as fh:
+                fh.write("PASS\n")
 
     def formula(self, caller):
         self.recursion_stack.append(Node("<FORMULA>", parent = caller))
@@ -545,12 +547,12 @@ def arg_parser():
 def main():
     arguments = arg_parser()
     with open(arguments.log_file_name, "w") as fh:
-        fh.write("Log file for input: " + arguments.input_file_name)
+        fh.write("Log file for input: " + arguments.input_file_name + "\n")
     input_from_file = LanguageDefinition()
     input_from_file.read_input(arguments.input_file_name, arguments.log_file_name)
     new_grammar = Grammar(input_from_file)
     new_grammar.output(arguments.grammar_file_name)
-    parse = Compiler(input_from_file, arguments.parse_tree_file_name)
+    parse = Compiler(input_from_file, arguments.parse_tree_file_name, arguments.log_file_name)
 
 if __name__ == "__main__":
     main()
