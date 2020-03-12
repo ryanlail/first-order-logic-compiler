@@ -392,7 +392,15 @@ class Compiler():
         if self.tokens[self.lookahead][0] == "(" and (self.tokens[self.lookahead + 2][0] != "<EQUALITY>"): # must look a head to check not equality
             self.recursion_stack.append(Node("(", parent = current))
             self.lookahead += 1
+            if self.lookahead >= len(self.tokens):
+                with open(self.log_file, "a") as fh:
+                    write("FILE ENDED UNEXPECTEDLY\n")
+                    sys.exit(1)
             if self.formula(current) and self.connectives(current) and self.formula(current):
+                if self.lookahead >= len(self.tokens):
+                    with open(self.log_file, "a") as fh:
+                        fh.write("FILE ENDED UNEXPECTEDLY\n")
+                        sys.exit(1)
                 if self.tokens[self.lookahead][0] == ")":
                     self.recursion_stack.append(Node( ")", parent = current))
                     self.lookahead += 1
@@ -400,6 +408,10 @@ class Compiler():
         elif self.tokens[self.lookahead][0] == "<NEG>":
             self.recursion_stack.append(Node(re.escape(self.LanguageDefinition.neg), parent = self.recursion_stack[-1]))
             self.lookahead += 1
+            if self.lookahead >= len(self.tokens):
+                with open(self.log_file, "a") as fh:
+                    write("FILE ENDED UNEXPECTEDLY\n")
+                    sys.exit(1)
             if self.formula(current):
                 return True
         else:
@@ -412,10 +424,20 @@ class Compiler():
         if self.tokens[self.lookahead][0] == "(":
             self.recursion_stack.append(Node("(", parent = current))
             self.lookahead += 1
+
+            if self.lookahead >= len(self.tokens):
+                with open(self.log_file, "a") as fh:
+                    write("FILE ENDED UNEXPECTEDLY\n")
+                    sys.exit(1)
             if self.var_con(current):
                 if self.tokens[self.lookahead][0] == "<EQUALITY>" :
                     self.recursion_stack.append(Node(re.escape(self.LanguageDefinition.equality), parent = current))
                     self.lookahead += 1
+
+                    if self.lookahead >= len(self.tokens):
+                        with open(self.log_file, "a") as fh:
+                            write("FILE ENDED UNEXPECTEDLY\n")
+                            sys.exit(1)
                     if self.var_con(current):
                         if self.tokens[self.lookahead][0] == ")":
                             self.recursion_stack.append(Node(")", parent = current))
@@ -437,9 +459,17 @@ class Compiler():
             self.recursion_stack.append(Node(re.escape(self.tokens[self.lookahead][0]), parent = self.recursion_stack[-1]))
             arity = self.LanguageDefinition.predicates[self.tokens[self.lookahead][0]]
             self.lookahead += 1
+            if self.lookahead >= len(self.tokens):
+                with open(self.log_file, "a") as fh:
+                    write("FILE ENDED UNEXPECTEDLY\n")
+                    sys.exit(1)
             if self.tokens[self.lookahead][0] == "(":
                 self.recursion_stack.append(Node("(", parent = current))
                 self.lookahead += 1
+                if self.lookahead >= len(self.tokens):
+                    with open(self.log_file, "a") as fh:
+                        write("FILE ENDED UNEXPECTEDLY\n")
+                        sys.exit(1)
                 for i in range(arity - 1):
                     if self.variables(current):
                         if self.tokens[self.lookahead][0] == ",":
@@ -537,7 +567,7 @@ def main():
     arguments = arg_parser()
     with open(arguments.log_file_name, "a") as fh:
         now = str(datetime.now())
-        fh.write(now + "\nLog file for input: " + arguments.input_file_name + "\n")
+        fh.write("\n\n" + now + "\nLog file for input: " + arguments.input_file_name + "\n")
     input_from_file = LanguageDefinition()
     input_from_file.read_input(arguments.input_file_name, arguments.log_file_name)
     new_grammar = Grammar(input_from_file)
