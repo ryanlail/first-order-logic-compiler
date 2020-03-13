@@ -1,0 +1,5 @@
+2020-03-12 20:34:42.848543
+Log file for input: example.txt
+PASS
+
+

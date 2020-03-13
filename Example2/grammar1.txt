@@ -1,0 +1,14 @@
+Terminal Symbols: {IFF, AND, Z, notEqual, cost1, OR, A, Non_zero, ,, (, Same, price, IMPLIES, E, NOT, 30, ==, )}
+Non-terminal Symbols: {'<PREDICATE>', '<CONNECTIVES>', '<QUANTIFIERS>', '<LOGIC>', '<VARIABLES>', '<EQUALITY>', '<QUANTIFICATION>', '<FORMULA>', '<CONSTANTS>', '<VAR_CON>'}
+Production Rules: 
+<FORMULA> ->  <QUANTIFICATION> | <LOGIC> | <EQUALITY> | <PREDICATE>
+<QUANTIFICATION> ->  <QUANTIFIERS> <VARIABLES> <FORMULA>
+<LOGIC> ->  (<FORMULA> <CONNECTIVES> <FORMULA>) | NOT <FORMULA>
+<EQUALITY> ->  (<VAR_CON> == <VAR_CON>)
+<PREDICATE> ->  Same(<VARIABLES>, <VARIABLES>) | Non_zero(<VARIABLES>) | notEqual(<VARIABLES>, <VARIABLES>, <VARIABLES>) 
+<VAR_CON> ->  <VARIABLES> | <CONSTANTS>
+<QUANTIFIERS> ->  E | A
+<CONNECTIVES> ->  AND | OR | IMPLIES | IFF
+<CONSTANTS> ->  30 | Z 
+<VARIABLES> ->  price | cost1 
+Start Symbol: <FORMULA>

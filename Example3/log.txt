@@ -1,0 +1,4 @@
+2020-03-12 20:36:36.523280
+Log file for input: example.txt
+ERROR reading in file: 
+ CONSTANT z is a repeated identifier

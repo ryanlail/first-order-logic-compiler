@@ -1,0 +1,6 @@
+2020-03-12 20:37:20.803439
+Log file for input: example.txt
+Unexpected character at pos 17 - xx EXPECTED VARIABLE
+FAIL
+
+

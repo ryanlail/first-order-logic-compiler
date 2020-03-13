@@ -1,0 +1,14 @@
+Terminal Symbols: {\neg, =, D, \land, \implies, \forall, P, x, Q, \exists, (, ), \iff, w, z, y, ,, \lor, C}
+Non-terminal Symbols: {'<QUANTIFIERS>', '<CONNECTIVES>', '<EQUALITY>', '<LOGIC>', '<PREDICATE>', '<FORMULA>', '<CONSTANTS>', '<QUANTIFICATION>', '<VAR_CON>', '<VARIABLES>'}
+Production Rules: 
+<FORMULA> ->  <QUANTIFICATION> | <LOGIC> | <EQUALITY> | <PREDICATE>
+<QUANTIFICATION> ->  <QUANTIFIERS> <VARIABLES> <FORMULA>
+<LOGIC> ->  (<FORMULA> <CONNECTIVES> <FORMULA>) | \neg <FORMULA>
+<EQUALITY> ->  (<VAR_CON> = <VAR_CON>)
+<PREDICATE> ->  P(<VARIABLES>, <VARIABLES>) | Q(<VARIABLES>) 
+<VAR_CON> ->  <VARIABLES> | <CONSTANTS>
+<QUANTIFIERS> ->  \exists | \forall
+<CONNECTIVES> ->  \land | \lor | \implies | \iff
+<CONSTANTS> ->  C | D 
+<VARIABLES> ->  w | x | y | z 
+Start Symbol: <FORMULA>
