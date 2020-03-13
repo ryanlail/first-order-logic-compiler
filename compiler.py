@@ -346,13 +346,17 @@ class Compiler():
 
     def analysis(self, parse_tree_name):
         self.lookahead = 0
-        if self.formula(None):
+        if self.formula(None) and self.lookahead == len(self.tokens):
             UniqueDotExporter(self.recursion_stack[0]).to_picture(parse_tree_name)
             with open(self.log_file, "a") as fh:
                 fh.write("PASS\n\n\n")
         else:
+            try:
+                bad_value = self.symbol_table[self.tokens[self.lookahead][1]]
+            except:
+                bad_value = self.tokens[self.lookahead][0]
             with open(self.log_file, "a") as fh:
-                fh.write("FAIL\n\n")
+                fh.write("FAIL. Unexpected char at pos " + str(self.lookahead + 1) + " - " + bad_value + "\n\n")
 
     def formula(self, caller):
         self.recursion_stack.append(Node("<FORMULA>", parent = caller))
