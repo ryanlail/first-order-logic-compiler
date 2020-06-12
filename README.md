@@ -52,4 +52,3 @@ For examples on how to format the input files, please see example 1 included in 
 * Example 2 - valid input
 * Example 3 - Invalid input file (hence no tree, no grammar)
 * Example 4 - Invalid formula (hence grammar no tree)
-* Example 5 - Invalid formula (extra bracket at end of formula)
