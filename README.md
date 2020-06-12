@@ -1,4 +1,4 @@
-# First-Order-Logic_Compiler
+# First-Order-Logic-Compiler
 A front-end compiler for First-Order Logic. Performs Lexical and Syntax analysis, and produces a parse tree.
 
 ## First Order Logic
