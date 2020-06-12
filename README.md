@@ -1,5 +1,5 @@
 # First-Order-Logic-Compiler
-A front-end compiler for First-Order Logic. Performs Lexical and Syntax analysis, and produces the corresponding grammar and production rules for the given formulae and a parse tree.
+A front-end compiler for First-Order Logic. Performs Lexical and Syntax analysis, and produces the corresponding grammar and production rules for the given formulae and a parse tree. Where invalid formulae are used, the wrong character and it's position will be identified in the log file.
 
 ## First Order Logic
 If you are new to first order logic, it is recomended to read this wikipedia article first https://en.wikipedia.org/wiki/First-order_logic#Syntax
@@ -27,3 +27,22 @@ distinct), the atom P(y1,..., yd) is a valid formula.
 4. If φ is a valid formula, then for any variable x ∈ V , ∃xφ and ∀xφ are also valid formulae.
 For instance, for V = {w, x, y, z}, C = {C,D} and P = {P,Q} with respective arities 2 and 1, the following is a valid formula:
 ∀x(∃y(P(x, y) =⇒ ¬Q(x))∨ ∃z(((C = z)∧Q(z))∧ P(x, z)))
+
+## Installation
+This Program requires: 
+* Python 3.6+ https://www.python.org/downloads/
+* Graphviz https://graphviz.org/download
+* anytree `pip3 install anytree` from the command-line
+
+## Usage
+`python3 compiler.py`
+
+### Options
+* -h - help
+* -i - input file name
+* -g - grammar output file name
+* -t - parse tree output file name
+* -l - log file name
+
+## Input files
+For examples on how to format the input files, please see the examples included in this repository
