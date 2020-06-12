@@ -1,5 +1,5 @@
 # First-Order-Logic-Compiler
-A front-end compiler for First-Order Logic. Performs Lexical and Syntax analysis, and produces a parse tree.
+A front-end compiler for First-Order Logic. Performs Lexical and Syntax analysis, and produces the corresponding grammar and production rules for the given formulae and a parse tree.
 
 ## First Order Logic
 If you are new to first order logic, it is recomended to read this wikipedia article first https://en.wikipedia.org/wiki/First-order_logic#Syntax
