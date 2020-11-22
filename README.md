@@ -1,4 +1,4 @@
-# First-Order-Logic-Compiler
+# first-order-logic-compiler
 A front-end compiler for First-Order Logic. Performs Lexical and Syntax analysis, and produces the corresponding grammar and production rules for the given formulae and a parse tree. Where invalid formulae are used, the wrong character and it's position will be identified in the log file.
 
 ## First Order Logic
